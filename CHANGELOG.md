@@ -1,4 +1,32 @@
 
+<a id='changelog-0.3.4'></a>
+# 0.3.4 — 2023-12-01
+
+## Fixed bugs
+
+- [x] #bug🐛 (modules): :bug: fixed the geometry links behave not stably.
+
+<a id='changelog-0.3.3'></a>
+# 0.3.3 — 2023-11-29
+
+## Fixed bugs
+
+- [x] #bug🐛 fixing `random.choice` triggered error : `'super' object has no attribute 'random'`
+
+<a id='changelog-0.3.2'></a>
+# 0.3.2 — 2023-11-29
+
+## New Features
+
+- [ ] #feat✨ Generate random links between actors with the possibility
+
+<a id='changelog-0.3.1'></a>
+# 0.3.1 — 2023-11-28
+
+## Performance improvements
+
+- [x] #build🏗 Un-pin the dependencies and upgrade
+
 <a id='changelog-0.3.0'></a>
 # 0.3.0 — 2023-11-11
 

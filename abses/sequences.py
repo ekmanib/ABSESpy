@@ -26,6 +26,7 @@ import mesa_geo as mg
 import numpy as np
 
 from abses.errors import ABSESpyError
+from abses.random import ListRandom
 
 from .tools.func import make_list, norm_choice
 
@@ -68,6 +69,8 @@ class ActorsList(list):
     def __getattr__(self, name: str) -> np.ndarray:
         """Return callable list of attributes"""
         # Private variables are looked up normally
+        if name == "random":
+            return getattr(super(), name)
         if name[0] == "_":
             return getattr(super(), name)
         if name in self.__dir__():
@@ -92,7 +95,7 @@ class ActorsList(list):
     def __getitem__(self, index):
         results = super().__getitem__(index)
         return (
-            ActorsList(self.model, results)
+            ActorsList(self._model, results)
             if isinstance(index, slice)
             else results
         )
@@ -111,6 +114,12 @@ class ActorsList(list):
             return False
         return True
 
+    @property
+    def random(self) -> ListRandom:
+        """随机模块"""
+        seed = getattr(self._model, "_seed")
+        return ListRandom(actors=self, seed=seed)
+
     def to_dict(self) -> Dict[str, Self]:
         """Convert all actors in this list to a dictionary like {breed: ActorList}.
 
@@ -121,7 +130,7 @@ class ActorsList(list):
         for actor in iter(self):
             breed = actor.breed
             if breed not in dic:
-                dic[breed] = ActorsList(self.model, [actor])
+                dic[breed] = ActorsList(self._model, [actor])
             else:
                 dic[breed].append(actor)
         return dic
@@ -142,7 +151,7 @@ class ActorsList(list):
         else:
             raise TypeError(f"Invalid selection type {type(selection)}")
         selected = [a for a, s in zip(self, bool_) if s]
-        return ActorsList(self.model, selected)
+        return ActorsList(self._model, selected)
 
     def ids(self, ids: Iterable[int]) -> List[Actor]:
         """Subsets ActorsList by a `ids`.
@@ -188,13 +197,17 @@ class ActorsList(list):
             ValueError:
                 If size is not a positive integer.
         """
+        # TODO refactor this to `self.random.choice`
+        logger.warning(
+            "Deprecated Warning: In the next version, use `ActorsList.random.choice` instead of `ActorsList.random_choose`."
+        )
         chosen = norm_choice(self, p=prob, size=size, replace=replace)
         if as_list:
-            return ActorsList(self.model, objs=chosen)
+            return ActorsList(self._model, objs=chosen)
         if size == 1:
             return chosen[0]
         if size > 1:
-            return ActorsList(self.model, chosen)
+            return ActorsList(self._model, chosen)
         raise ValueError(f"Invalid size {size}.")
 
     def better(
